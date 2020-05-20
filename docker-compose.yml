@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testdb
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./test-db:/var/lib/postgresql/data
+
+  server-app:
+    build: server/
+    image: dry-cleaning-server
+    depends_on:
+      - postgres
+      - redis
+    ports:
+    - "4000:4000"
+
+  post-server:
+    build: post-server/
+    image: dry-cleaning-post-server
+    depends_on:
+      - redis
+    ports:
+    - "5000:5000"
+    
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
